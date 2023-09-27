@@ -1,0 +1,16 @@
+version: "3.2"
+
+services:
+  kirk-gateway-test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    command: python -m pytest # --cov="." --cov-report term-missing -rfsxE
+    ports:
+      - 10011:10011
+    volumes:
+      - ../:/usr/src/app/
+    environment:
+      - DATABASE_SERVICE=http://kirk-db-service:8010/
+      - RESULTS_SERVICE=http://kyrk-results-db-api:80/
+      - LEGACY_SERVICE=http://kyrk-engine:80/

@@ -1,0 +1,28 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata: 
+  name: kyrk-gateway
+build:
+  artifacts:
+    - image: gcr.io/guaneocr/kyrk-gateway
+      docker: 
+        dockerfile: docker/Dockerfile.dev
+      sync:
+        infer:
+        - '/usr/src/app/*.py'
+deploy:
+  kustomize:
+    paths:
+      - "kubernetes/overlays/dev"
+profiles:
+- name: prod
+  deploy:
+    kustomize:
+      paths:
+        - "kubernetes/overlays/prod"
+portForward:
+  - resourceType: deployment
+    resourceName: kyrk-gateway
+    port: 80
+    localPort: 8900
+  

@@ -1,0 +1,27 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "==0.100.*"
+pydantic = {extras = ["email"], version = "==1.10.*"}
+httpx = "==0.24.*"
+uvicorn = "==0.22.0"
+firebase-admin = "==6.2.*"
+python-multipart = "==0.0.*"
+
+[dev-packages]
+black = "*"
+pre-commit = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-asyncio = "*"
+debugpy = "*"
+
+[requires]
+python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true

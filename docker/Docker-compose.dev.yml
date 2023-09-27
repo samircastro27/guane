@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+    kirk-gateway:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.dev
+        command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8010
+        volumes:
+            - ../:/usr/src/app/
+        ports:
+            - 8009:8010
+            - 9999:9999
+        environment:
+            - DEBUGGER=True
+            - DATABASE_SERVICE=http://kirk-db-service:8010/
+            - API_FIREBASE_KEY=AIzaSyDDEta804lGjr_QwXQkj8tJvlFh_mqZxcs
+            - RESULTS_SERVICE=http://kyrk-results-db-api:80/
+            - LEGACY_SERVICE=http://kyrk-engine:80/
+        networks:
+            - kirk
+
+networks:
+    kirk:
+        external: True

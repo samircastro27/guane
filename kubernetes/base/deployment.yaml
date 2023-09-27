@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyrk-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kyrk-gateway
+  template:
+    metadata:
+      labels:
+        app: kyrk-gateway
+    spec:
+      nodeSelector:
+        type: "principal"
+      containers:
+        - name: kyrk-gateway
+          image: gcr.io/guaneocr/kyrk-gateway
+          imagePullPolicy: Always
+          # env for firebase
+          env:
+          - name: API_FIREBASE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: firebase-key-kyrk
+                key: key
+          command:
+            - "uvicorn"
+          args: [
+                "app.main:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "80",
+                "--log-level",
+                "info",
+                "--workers",
+                "1",
+              ]
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "80m"
+          ports: 
+            - containerPort: 80
+              name: http
+          envFrom:
+            - configMapRef:
+                name: kyrk-gateway-config
+          volumeMounts:
+            - name: account-firebase
+              mountPath: "/usr/src/app/key/"
+              readOnly: true          
+      volumes:
+        - name: account-firebase
+          secret:
+            secretName: account-firebase

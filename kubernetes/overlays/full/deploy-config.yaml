@@ -1,0 +1,123 @@
+apiVersion: v1
+data:
+  DATABASE_SERVICE: http://kyrk-database.kyrk.svc.cluster.local/
+  DEBUG: "False"
+  LEGACY_SERVICE: http://kyrk-engine.kyrk.svc.cluster.local/
+  RESULTS_SERVICE: http://kyrk-results-db.kyrk.svc.cluster.local/
+kind: ConfigMap
+metadata:
+  labels:
+    app: kyrk-gateway
+    tier: backend
+  name: kyrk-gateway-config
+  namespace: kyrk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kyrk-gateway
+    tier: backend
+  name: kyrk-gateway
+  namespace: kyrk
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: kyrk-gateway
+    tier: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kyrk-gateway
+    tier: backend
+  name: kyrk-gateway
+  namespace: kyrk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kyrk-gateway
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: kyrk-gateway
+        tier: backend
+    spec:
+      containers:
+        - args:
+            - app.main:app
+            - --host
+            - 0.0.0.0
+            - --port
+            - "80"
+            - --log-level
+            - info
+            - --workers
+            - "1"
+          command:
+            - uvicorn
+          env:
+            - name: API_FIREBASE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: key
+                  name: firebase-key-kyrk
+          envFrom:
+            - configMapRef:
+                name: kyrk-gateway-config
+          image: gcr.io/guaneocr/kyrk-gateway:0.1.123@sha256:2529c8912c4ce36f9d27bb6e20d8af47dfcefaf367c071e59212ce02d378be60
+          imagePullPolicy: Always
+          name: kyrk-gateway
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              cpu: 80m
+              memory: 50Mi
+          volumeMounts:
+            - mountPath: /usr/src/app/key/
+              name: account-firebase
+              readOnly: true
+      nodeSelector:
+        type: principal
+      volumes:
+        - name: account-firebase
+          secret:
+            secretName: account-firebase
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    kubernetes.io/ingress.class: nginx
+  labels:
+    app: kyrk-gateway
+    tier: backend
+    use-http01-solver: "true"
+  name: kyrk-gateway
+  namespace: kyrk
+spec:
+  rules:
+    - host: kyrk.guane.dev
+      http:
+        paths:
+          - backend:
+              service:
+                name: kyrk-gateway
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - kyrk.guane.dev
+      secretName: kyrk-gateway

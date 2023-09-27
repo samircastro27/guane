@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kyrk-gateway-config
+data:
+  DEBUG: "False"
+  DATABASE_SERVICE: "http://kyrk-database.kyrk.svc.cluster.local/"
+  RESULTS_SERVICE: "http://kyrk-results-db.kyrk.svc.cluster.local/"
+  LEGACY_SERVICE: "http://kyrk-engine.kyrk.svc.cluster.local/"
+  #LEGACY_SERVICE: "http://kyrk-legacy-db-api:80/"
