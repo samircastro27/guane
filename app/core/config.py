@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     #: Database Service
-    DATABASE_SERVICE: str
+    DATABASE_SERVICE: str = 'http://kyrk-database.kyrk.svc.cluster.local/'
 
     #: Exceptions
     EXCEPTIONS: dict = {
@@ -51,9 +51,9 @@ class Settings(BaseSettings):
 
     API_FIREBASE_KEY: str = 'key'
     
-    LEGACY_SERVICE: str
+    LEGACY_SERVICE: str = 'http://kyrk-engine.kyrk.svc.cluster.local/'
 
-    RESULTS_SERVICE: str
+    RESULTS_SERVICE: str = 'http://kyrk-results-db.kyrk.svc.cluster.local/'
 
 
 @lru_cache()
