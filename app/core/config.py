@@ -50,11 +50,11 @@ class Settings(BaseSettings):
     API_FIREBASE_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
 
     API_FIREBASE_KEY: str = 'key'
-    
+
     LEGACY_SERVICE: str
 
     RESULTS_SERVICE: str
-s
+
 
 @lru_cache()
 def get_settings() -> BaseSettings:
