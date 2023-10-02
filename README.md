@@ -160,3 +160,5 @@ export MONGODB_ROOT_PASSWORD=$(kubectl get secret --namespace default mongo-mong
 ```
 ![image](https://user-images.githubusercontent.com/44074556/209145181-dffd8e02-9bba-4ce8-9012-6b05aaf7a84c.png)
 
+
+
